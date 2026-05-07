@@ -1,0 +1,9 @@
+# Archivos que Google Cloud Build debe ignorar
+target/
+.idea/
+*.iml
+.git/
+.mvn/
+*.log
+docker-compose.yml
+.env

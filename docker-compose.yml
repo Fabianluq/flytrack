@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: flytrack-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: flytrack
+      MYSQL_USER: flytrack_user
+      MYSQL_PASSWORD: flytrack_pass
+    ports:
+      - "3308:3306"
+    volumes:
+      - flytrack_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  flytrack-app:
+    build: .
+    container_name: flytrack-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # Base de datos (local — sin Cloud SQL socket)
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/flytrack?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: flytrack_user
+      SPRING_DATASOURCE_PASSWORD: flytrack_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # JWT
+      JWT_SECRET: "local-dev-secret-key-must-be-at-least-32-chars-long"
+      # CORS
+      CORS_ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:5173"
+      CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS,PATCH"
+      CORS_MAX_AGE: "3600"
+      # Mail (vacío en local)
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      # Puerto
+      PORT: "8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  flytrack_mysql_data:

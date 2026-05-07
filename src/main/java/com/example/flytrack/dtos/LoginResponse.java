@@ -4,18 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UsuarioResponse {
+public class LoginResponse {
+    private String accessToken;
+    private String refreshToken;
+    private String tipo;
     private Integer idUsuario;
     private String nombre;
     private String apellido;
     private String correo;
-    private String telefono;
-    private LocalDateTime fechaRegistro;
-    private Boolean estado;
-    private RolResponse rol;
+    private String rol;
 }
